@@ -66,9 +66,9 @@
     <style name="SuperuserDarkActivity" parent="@style/AppDarkActivityTheme" />
     
     <!-- Want to switch to the dark theme? Change these three styles to Dark. -->
-    <style name="RequestTheme" parent="RequestThemeLight" />
-    <style name="Superuser" parent="SuperuserLight" />
-    <style name="SuperuserActivity" parent="SuperuserLightActivity" />
+    <style name="RequestTheme" parent="RequestThemeDark" />
+    <style name="Superuser" parent="SuperuserDark" />
+    <style name="SuperuserActivity" parent="SuperuserDarkActivity" />
 
     <style name="AppActivityBaseTheme" parent="SuperuserLight" />
     <style name="AppDarkActivityBaseTheme" parent="SuperuserDark" />
