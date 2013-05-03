@@ -107,6 +107,14 @@ public class MainActivity extends BetterListActivity {
                     doEntry(zout, "assets/update-binary", "META-INF/com/google/android/update-binary");
                     zout.close();
 
+                    ZipFile zf = new ZipFile(getPackageCodePath());
+                    ZipEntry ze = zf.getEntry("assets/reboot");
+                    InputStream in;
+                    FileOutputStream reboot;
+                    StreamUtility.copyStream(in = zf.getInputStream(ze), reboot = openFileOutput("reboot", MODE_PRIVATE));
+                    reboot.close();
+                    in.close();
+
                     final File su = extractSu();
 
                     String command =
@@ -118,10 +126,15 @@ public class MainActivity extends BetterListActivity {
                             "chmod 644 /cache/superuser.zip\n" +
                             "chmod 644 /cache/recovery/command\n" +
                             "sync\n" +
+                            String.format("chmod 755 %s\n", getFileStreamPath("reboot").getAbsolutePath()) +
                             "reboot recovery\n";
                     Process p = Runtime.getRuntime().exec("su");
                     p.getOutputStream().write(command.getBytes());
                     p.getOutputStream().close();
+                    File rebootScript = getFileStreamPath("reboot.sh");
+                    StreamUtility.writeFile(rebootScript, "reboot recovery ; " + getFileStreamPath("reboot").getAbsolutePath() + " recovery ;");
+                    p.waitFor();
+                    Runtime.getRuntime().exec(new String[] { "su", "-c", ". " + rebootScript.getAbsolutePath() });
                     if (p.waitFor() != 0)
                         throw new Exception("non zero result");
                 }
@@ -227,7 +240,7 @@ public class MainActivity extends BetterListActivity {
     }
     
     // this is intentionally not localized as it will change constantly.
-    private static final String WHATS_NEW = "This update includes a security fix. See Google Play release notes for more information.";
+    private static final String WHATS_NEW = "Recovery installation fixes for some devices.";
     protected void doWhatsNew() {
         if (WHATS_NEW.equals(Settings.getString(this, "whats_new")))
             return;
